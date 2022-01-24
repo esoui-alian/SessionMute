@@ -29,7 +29,7 @@ end
 SLASH_COMMANDS["/unmute"] = RemoveMutedPlayerFromList
 
 ----------
---PreHook Chat Router
+--Function for PreHook Chat Router (Hooked at OnPlayerActivated below)
 ----------
 
 local function FormatAndAddChatMessage(_, eventKey, ...)
@@ -75,14 +75,39 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 
 	return true
 end
-ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 
 ----------
---PreHook Chat Player Context Menu
+--Add PlayerContextMenu Option
 ----------
+
+local function OnPlayerActivated()
+	local function SessionMute(playerName, rawName)
+		local function MutePlayerForSession()
+			if not muteList[playerName] then
+				muteList[playerName] = true
+				CHAT_ROUTER:AddSystemMessage(zo_strformat("<<1>>: [<<2>>]", GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
+			end
+		end
+
+		local function UnMutePlayerForSession()
+			RemoveMutedPlayerFromList(playerName)
+		end
+
+		if not muteList[playerName] then
+			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
+		else
+			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
+		end
+	end
+
+	LibCustomMenu:RegisterPlayerContextMenu(SessionMute, LibCustomMenu.CATEGORY_LATE)
+
+	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
+end
+EVENT_MANAGER:RegisterForEvent(addOnName, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
 --Rewrite ShowPlayerContextMenu (on Keyboard only)
-local function ShowPlayerContextMenu(_, playerName, rawName)
+--[[local function ShowPlayerContextMenu(_, playerName, rawName)
 	ClearMenu()
 
 	-- Add to/Remove from Group
@@ -152,7 +177,7 @@ local function ShowPlayerContextMenu(_, playerName, rawName)
 
 	return true
 end
-ZO_PreHook(KEYBOARD_CHAT_SYSTEM, "ShowPlayerContextMenu", ShowPlayerContextMenu)
+ZO_PreHook(KEYBOARD_CHAT_SYSTEM, "ShowPlayerContextMenu", ShowPlayerContextMenu)]]
 
 ----------
 --Settings
