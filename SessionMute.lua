@@ -42,16 +42,11 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 		return
 	end
 
-	-- Don't display if is 'muted'
-
+	-- If 'muted', don't display
 	local charName = zo_strformat("<<1>>", fromName)
 	if fromDisplayName and (muteList[charName] or muteList[fromDisplayName]) then
+		-- If showMissedMessage then show the chat from a muted player, but 'mute' the text
 		if SessionMute.SV.showMissedMessage then 
-			if not SessionMute.SV.showMissedMessagePlayerName then
-				fromDisplayName = zo_strformat("@<<1>>", GetString(MUTE_PLAYER_MUTED))
-				fromName = zo_strformat("<<1>>", GetString(MUTE_PLAYER_MUTED))
-			end
-
 			text = zo_strformat("<<<1>>>", GetString(MUTE_PLAYER_MUTED_MESSAGE_DEFAULT))
 		else return end
 	else return end
@@ -89,9 +84,6 @@ ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 --Rewrite ShowPlayerContextMenu (on Keyboard only)
 local function ShowPlayerContextMenu(_, playerName, rawName)
 	ClearMenu()
-
-	-- If the player is showing up as "Muted" then it could get buggy so let's not allow menus here.
-	if playerName == GetString(MUTE_PLAYER_MUTED) or rawName == GetString(MUTE_PLAYER_MUTED) then return end
 
 	-- Add to/Remove from Group
 	if IsGroupModificationAvailable() then
@@ -190,19 +182,9 @@ local optionsTable = {
 		name = "Notify in Chat of Muted Messages",
 		getFunc = function() return SessionMute.SV.showMissedMessage end,
 		setFunc = function(value) SessionMute.SV.showMissedMessage = value end,
-		tooltip = "If true this will display a chat message that muted player has sent a message, but not what that message was.",
+		tooltip = "If true this will display a chat message that a muted player has sent a message, but not what that message was.",
 		width = "full", -- or "half" (optional)
 		default = defaultVars.showMissedMessage,
-	},
-	[3] = {
-		type = "checkbox",
-		name = "Reveal Player Name in Muted Messages",
-		getFunc = function() return SessionMute.SV.showMissedMessagePlayerName end,
-		setFunc = function(value) SessionMute.SV.showMissedMessagePlayerName = value end,
-		tooltip = "If true this will not hide the muted player's name when notifying in chat of a missed muted message.",
-		width = "full", -- or "half" (optional)
-		disabled = function() return not SessionMute.SV.showMissedMessage end,
-		default = defaultVars.showMissedMessagePlayerName,
 	},
 }
 
@@ -213,7 +195,7 @@ local optionsTable = {
 local function OnLoad(e, addOnName)
 	if addOnName ~= addonName then return end
 
-	SessionMute.SV = ZO_SavedVars:NewCharacterIdSettings("SessionMuteSavedVars", 1, nil, defaultVars, GetWorldName())
+	SessionMute.SV = ZO_SavedVars:NewAccountWide("SessionMuteSavedVars", 1, nil, defaultVars, GetWorldName())
 
 	local LAM = LibAddonMenu2
 	LAM:RegisterAddonPanel(addonName, panelData)
