@@ -1,15 +1,27 @@
 ----------
 ----------
-local addonName = "SessionMute"
-local muteList = muteList or {}
-local SessionMute = SessionMute or {}
+
+SessionMute = SessionMute or {}
+local sm = SessionMute
+sm.name = "SessionMute"
+sm.displayName = "Session Mute"
+sm.author = "Alianym"
+sm.version = "0.01"
+
+local addonName =  sm.name
+sm.muteList = {}
+local muteList = sm.muteList
+sm.SV = {}
+local settings = sm.SV
+
+local zostrfor = zo_strformat
 
 ----------
 --SLASH_COMMANDS
 ----------
 
 local function GetMutedPlayersList()
-	CHAT_ROUTER:AddSystemMessage(zo_strformat("<<1>>: ", GetString(MUTE_PLAYER_SHOW_LIST)))
+	CHAT_ROUTER:AddSystemMessage(GetString(MUTE_PLAYER_SHOW_LIST))
 	for name, isMuted in pairs(muteList) do
 		if isMuted then
 			CHAT_ROUTER:AddSystemMessage(name)
@@ -21,9 +33,9 @@ SLASH_COMMANDS["/mutedlist"] = GetMutedPlayersList
 local function RemoveMutedPlayerFromList(name)
 	if muteList[name] then
 		muteList[name] = false
-		CHAT_ROUTER:AddSystemMessage(zo_strformat("<<1>> [<<2>>]", GetString(MUTE_PLAYER_PLAYER_UNMUTED), name))
+		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_UNMUTED), name))
 	else
-		CHAT_ROUTER:AddSystemMessage(zo_strformat("[<<1>>] <<2>>", name, GetString(MUTE_PLAYER_PLAYER_NOT_IN_LIST)))
+		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_NOT_IN_LIST), name))
 	end
 end
 SLASH_COMMANDS["/unmute"] = RemoveMutedPlayerFromList
@@ -35,19 +47,19 @@ SLASH_COMMANDS["/unmute"] = RemoveMutedPlayerFromList
 local function FormatAndAddChatMessage(_, eventKey, ...)
 	if not eventKey == EVENT_CHAT_MESSAGE_CHANNEL then return end -- Only interested in this event
 
-	local MultiLevelEventToCategoryMappings, SimpleEventToCategoryMappings = ZO_ChatSystem_GetEventCategoryMappings()
-	local messageType, fromName, text, isFromCustomerService, fromDisplayName = ...
-
 	if not IsChatSystemAvailableForCurrentPlatform() then
 		return
 	end
 
+	local MultiLevelEventToCategoryMappings, SimpleEventToCategoryMappings = ZO_ChatSystem_GetEventCategoryMappings()
+	local messageType, fromName, text, isFromCustomerService, fromDisplayName = ...
+
 	-- If 'muted', don't display
-	local charName = zo_strformat("<<1>>", fromName)
+	local charName = zostrfor("<<1>>", fromName)
 	if fromDisplayName and (muteList[charName] or muteList[fromDisplayName]) then
 		-- If showMissedMessage then show the chat from a muted player, but 'mute' the text
-		if SessionMute.SV.showMissedMessage then 
-			text = zo_strformat("<<<1>>>", GetString(MUTE_PLAYER_MUTED_MESSAGE_DEFAULT))
+		if settings.showMissedMessage then
+			text = GetString(MUTE_PLAYER_MUTED_MESSAGE_DEFAULT)
 		else return end
 	else return end
 
@@ -55,7 +67,7 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 	if SimpleEventToCategoryMappings[eventKey] then
 		eventCategory = SimpleEventToCategoryMappings[eventKey]
 	elseif MultiLevelEventToCategoryMappings[eventKey] then
-		local messageType = select(1, ...)
+		messageType = select(1, ...)
 		eventCategory = MultiLevelEventToCategoryMappings[eventKey][messageType]
 	end
 
@@ -85,7 +97,7 @@ local function OnPlayerActivated()
 		local function MutePlayerForSession()
 			if not muteList[playerName] then
 				muteList[playerName] = true
-				CHAT_ROUTER:AddSystemMessage(zo_strformat("<<1>>: [<<2>>]", GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
+				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
 			end
 		end
 
@@ -104,7 +116,7 @@ local function OnPlayerActivated()
 
 	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 end
-EVENT_MANAGER:RegisterForEvent(addOnName, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
+EVENT_MANAGER:RegisterForEvent(addonName, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
 --Rewrite ShowPlayerContextMenu (on Keyboard only)
 --[[local function ShowPlayerContextMenu(_, playerName, rawName)
@@ -145,7 +157,7 @@ EVENT_MANAGER:RegisterForEvent(addOnName, EVENT_PLAYER_ACTIVATED, OnPlayerActiva
 	local function MutePlayerForSession()
 		if not muteList[playerName] then
 			muteList[playerName] = true
-			CHAT_ROUTER:AddSystemMessage(zo_strformat("<<1>>: [<<2>>]", GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
+			CHAT_ROUTER:AddSystemMessage(zostrfor("<<1>>: [<<2>>]", GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
 		end
 	end
 
@@ -167,7 +179,7 @@ EVENT_MANAGER:RegisterForEvent(addOnName, EVENT_PLAYER_ACTIVATED, OnPlayerActiva
 	end
 
 	-- Report player
-	AddMenuItem(zo_strformat(SI_CHAT_PLAYER_CONTEXT_REPORT, rawName), function()
+	AddMenuItem(zostrfor(SI_CHAT_PLAYER_CONTEXT_REPORT, rawName), function()
 		ZO_HELP_GENERIC_TICKET_SUBMISSION_MANAGER:OpenReportPlayerTicketScene(playerName, IgnoreSelectedPlayer)
 	end)
 
@@ -187,27 +199,27 @@ local defaultVars = {showMissedMessage = false, showMissedMessagePlayerName = fa
 
 local panelData = {
 	type = "panel",
-	name = "Session Mute",
-	displayName = "Session Mute",
-	author = "Alianym",
-	version = "0.01",
-	--slashCommand = "/muteplayersettings",
-	registerForRefresh = true,
+	name = 			sm.name,
+	displayName = 	sm.displayName,
+	author = 		sm.author,
+	version = 		sm.version,
+	--slashCommand = "/sessionmutesettings",
+	registerForRefresh = false, --not needed if there are no disabled functions or other callbacks!
 	registerForDefaults = true,
 }
 
 local optionsTable = {
 	[1] = {
 		type = "header",
-		name = "Options",
+		name = GetString(MUTE_PLAYER_LAM_OPTIONS),
 		width = "full",	--or "half" (optional)
 	},
 	[2] = {
 		type = "checkbox",
-		name = "Notify in Chat of Muted Messages",
-		getFunc = function() return SessionMute.SV.showMissedMessage end,
-		setFunc = function(value) SessionMute.SV.showMissedMessage = value end,
-		tooltip = "If true this will display a chat message that a muted player has sent a message, but not what that message was.",
+		name = GetString(MUTE_PLAYER_LAM_CHAT_NOTIFY),
+		tooltip = GetString(MUTE_PLAYER_LAM_CHAT_NOTIFY_TT),
+		getFunc = function() return settings.showMissedMessage end,
+		setFunc = function(value) settings.showMissedMessage = value end,
 		width = "full", -- or "half" (optional)
 		default = defaultVars.showMissedMessage,
 	},
@@ -220,7 +232,8 @@ local optionsTable = {
 local function OnLoad(e, addOnName)
 	if addOnName ~= addonName then return end
 
-	SessionMute.SV = ZO_SavedVars:NewAccountWide("SessionMuteSavedVars", 1, nil, defaultVars, GetWorldName())
+	sm.SV = ZO_SavedVars:NewAccountWide("SessionMuteSavedVars", 1, nil, defaultVars, GetWorldName())
+	settings = sm.SV
 
 	local LAM = LibAddonMenu2
 	LAM:RegisterAddonPanel(addonName, panelData)
