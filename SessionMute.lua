@@ -56,8 +56,7 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 	local messageType, fromName, text, isFromCustomerService, fromDisplayName = ...
 
 	-- If 'muted', don't display
-	local charName = zostrfor("<<1>>", fromName)
-	if fromDisplayName and (muteList[charName] or muteList[fromDisplayName]) then
+	if fromDisplayName and (muteList[fromName] or muteList[fromDisplayName]) then
 		-- If showMissedMessage then show the chat from a muted player, but 'mute' the text
 		if settings.showMissedMessage then
 			text = GetString(MUTE_PLAYER_MUTED_MESSAGE_DEFAULT)
@@ -116,6 +115,8 @@ local function OnPlayerActivated()
 	LibCustomMenu:RegisterPlayerContextMenu(SessionMute, LibCustomMenu.CATEGORY_LATE)
 
 	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
+
+	EVENT_MANAGER:UnregisterForEvent(addonName, EVENT_PLAYER_ACTIVATED)
 end
 EVENT_MANAGER:RegisterForEvent(addonName, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
