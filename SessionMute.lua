@@ -93,27 +93,6 @@ end
 ----------
 
 local function OnPlayerActivated()
-	local function sessionMutePlayerContextMenu(playerName, rawName)
-		local function MutePlayerForSession()
-			if not muteList[rawName] then
-				muteList[rawName] = true
-				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
-			end
-		end
-
-		local function UnMutePlayerForSession()
-			RemoveMutedPlayerFromList(playerName, rawName)
-		end
-
-		if not muteList[rawName] then
-			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
-		else
-			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
-		end
-	end
-
-	LibCustomMenu:RegisterPlayerContextMenu(sessionMutePlayerContextMenu, LibCustomMenu.CATEGORY_LATE)
-
 	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 
 	EVENT_MANAGER:UnregisterForEvent(addonName, EVENT_PLAYER_ACTIVATED)
@@ -159,6 +138,7 @@ local optionsTable = {
 
 local function OnLoad(e, addOnName)
 	if addOnName ~= addonName then return end
+	EVENT_MANAGER:UnregisterForEvent(addonName, EVENT_ADD_ON_LOADED) 
 
 	sm.SV = ZO_SavedVars:NewAccountWide("SessionMuteSavedVars", 1, nil, defaultVars, GetWorldName())
 	settings = sm.SV
@@ -167,6 +147,27 @@ local function OnLoad(e, addOnName)
 	LAM:RegisterAddonPanel(addonName, panelData)
 	LAM:RegisterOptionControls(addonName, optionsTable)
 
-	EVENT_MANAGER:UnregisterForEvent(addonName, EVENT_ADD_ON_LOADED) 
+	
+	local function sessionMutePlayerContextMenu(playerName, rawName)
+		local function mutePlayerForSession()
+			if not muteList[playerName] then
+				muteList[playerName] = true
+				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
+			end
+		end
+
+		local function unMutePlayerForSession()
+			RemoveMutedPlayerFromList(playerName)
+		end
+
+		if not muteList[playerName] then
+			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_MUTE_MENU_ITEM), mutePlayerForSession)
+		else
+			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM), unMutePlayerForSession)
+		end
+	end
+
+	LibCustomMenu:RegisterPlayerContextMenu(sessionMutePlayerContextMenu, LibCustomMenu.CATEGORY_LATE)
+	
 end
 EVENT_MANAGER:RegisterForEvent(addonName, EVENT_ADD_ON_LOADED, OnLoad)
