@@ -24,18 +24,19 @@ local function GetMutedPlayersList()
 	CHAT_ROUTER:AddSystemMessage(GetString(MUTE_PLAYER_SHOW_LIST))
 	for name, isMuted in pairs(muteList) do
 		if isMuted then
-			CHAT_ROUTER:AddSystemMessage(name)
+			local fmtName = zostrfor("<<1>>", name) -- Because muteList stores rawName, we want to format it before displaying it
+			CHAT_ROUTER:AddSystemMessage(fmtName)
 		end
 	end
 end
 SLASH_COMMANDS["/mutedlist"] = GetMutedPlayersList
 
-local function RemoveMutedPlayerFromList(name)
-	if muteList[name] then
-		muteList[name] = false
-		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_UNMUTED), name))
+local function RemoveMutedPlayerFromList(playerName, rawName)
+	if muteList[rawName] then
+		muteList[rawName] = false
+		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_UNMUTED), playerName))
 	else
-		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_NOT_IN_LIST), name))
+		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_PLAYER_NOT_IN_LIST), playerName))
 	end
 end
 SLASH_COMMANDS["/unmute"] = RemoveMutedPlayerFromList
@@ -95,17 +96,17 @@ end
 local function OnPlayerActivated()
 	local function SessionMute(playerName, rawName)
 		local function MutePlayerForSession()
-			if not muteList[playerName] then
-				muteList[playerName] = true
+			if not muteList[rawName] then
+				muteList[rawName] = true
 				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
 			end
 		end
 
 		local function UnMutePlayerForSession()
-			RemoveMutedPlayerFromList(playerName)
+			RemoveMutedPlayerFromList(playerName, rawName)
 		end
 
-		if not muteList[playerName] then
+		if not muteList[rawName] then
 			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
 		else
 			AddCustomMenuItem(GetString(MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
@@ -117,79 +118,6 @@ local function OnPlayerActivated()
 	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 end
 EVENT_MANAGER:RegisterForEvent(addonName, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
-
---Rewrite ShowPlayerContextMenu (on Keyboard only)
---[[local function ShowPlayerContextMenu(_, playerName, rawName)
-	ClearMenu()
-
-	-- Add to/Remove from Group
-	if IsGroupModificationAvailable() then
-		local localPlayerIsGrouped = IsUnitGrouped("player")
-		local localPlayerIsGroupLeader = IsUnitGroupLeader("player")
-		local otherPlayerIsInPlayersGroup = IsPlayerInGroup(rawName)
-		if not localPlayerIsGrouped or (localPlayerIsGroupLeader and not otherPlayerIsInPlayersGroup) then
-			AddMenuItem(GetString(SI_CHAT_PLAYER_CONTEXT_ADD_GROUP), function()
-			local SENT_FROM_CHAT = false
-			local DISPLAY_INVITED_MESSAGE = true
-			TryGroupInviteByName(playerName, SENT_FROM_CHAT, DISPLAY_INVITED_MESSAGE) end)
-		elseif otherPlayerIsInPlayersGroup and localPlayerIsGroupLeader then
-			AddMenuItem(GetString(SI_CHAT_PLAYER_CONTEXT_REMOVE_GROUP), function() GroupKickByName(rawName) end)
-		end
-	end
-
-	-- Whisper
-	AddMenuItem(GetString(SI_CHAT_PLAYER_CONTEXT_WHISPER), function() KEYBOARD_CHAT_SYSTEM:StartTextEntry(nil, CHAT_CHANNEL_WHISPER, playerName) end)
-
-	-- Ignore
-	local function IgnoreSelectedPlayer()
-		if not IsIgnored(playerName) then
-			AddIgnore(playerName)
-		end
-	end
-
-	if not IsIgnored(playerName) then
-		AddMenuItem(GetString(SI_CHAT_PLAYER_CONTEXT_ADD_IGNORE), IgnoreSelectedPlayer)
-	end
-
-	----------
-	-- Session Mute/Unmute
-	----------
-	local function MutePlayerForSession()
-		if not muteList[playerName] then
-			muteList[playerName] = true
-			CHAT_ROUTER:AddSystemMessage(zostrfor("<<1>>: [<<2>>]", GetString(MUTE_PLAYER_SESSION_MUTE), playerName))
-		end
-	end
-
-	local function UnMutePlayerForSession()
-		RemoveMutedPlayerFromList(playerName)
-	end
-
-	if not muteList[playerName] then
-		AddMenuItem(GetString(MUTE_PLAYER_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
-	else
-		AddMenuItem(GetString(MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
-	end
-	----------
-	----------
-
-	-- Add Friend
-	if not IsFriend(playerName) then
-		AddMenuItem(GetString(SI_CHAT_PLAYER_CONTEXT_ADD_FRIEND), function() ZO_Dialogs_ShowDialog("REQUEST_FRIEND", { name = playerName }) end)
-	end
-
-	-- Report player
-	AddMenuItem(zostrfor(SI_CHAT_PLAYER_CONTEXT_REPORT, rawName), function()
-		ZO_HELP_GENERIC_TICKET_SUBMISSION_MANAGER:OpenReportPlayerTicketScene(playerName, IgnoreSelectedPlayer)
-	end)
-
-	if ZO_Menu_GetNumMenuItems() > 0 then
-		ShowMenu()
-	end
-
-	return true
-end
-ZO_PreHook(KEYBOARD_CHAT_SYSTEM, "ShowPlayerContextMenu", ShowPlayerContextMenu)]]
 
 ----------
 --Settings
@@ -204,7 +132,6 @@ local panelData = {
 	author = 		sm.author,
 	version = 		sm.version,
 	--slashCommand = "/sessionmutesettings",
-	registerForRefresh = false, --not needed if there are no disabled functions or other callbacks!
 	registerForDefaults = true,
 }
 
