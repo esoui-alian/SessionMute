@@ -93,7 +93,7 @@ end
 ----------
 
 local function OnPlayerActivated()
-	local function SessionMute(playerName, rawName)
+	local function sessionMutePlayerContextMenu(playerName, rawName)
 		local function MutePlayerForSession()
 			if not muteList[rawName] then
 				muteList[rawName] = true
@@ -112,7 +112,7 @@ local function OnPlayerActivated()
 		end
 	end
 
-	LibCustomMenu:RegisterPlayerContextMenu(SessionMute, LibCustomMenu.CATEGORY_LATE)
+	LibCustomMenu:RegisterPlayerContextMenu(sessionMutePlayerContextMenu, LibCustomMenu.CATEGORY_LATE)
 
 	ZO_PreHook(CHAT_ROUTER, "FormatAndAddChatMessage", FormatAndAddChatMessage)
 
