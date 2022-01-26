@@ -1,17 +1,18 @@
 local stringsEN = {
-	MUTE_PLAYER_SESSION_MUTE_MENU_ITEM = "Session Mute",
-	MUTE_PLAYER_SESSION_UNMUTE_MENU_ITEM = "Session Unmute",
-	MUTE_PLAYER_SESSION_MUTE = "You muted [<<1>>]",
-	MUTE_PLAYER_SHOW_LIST = "Muted players: ",
-	MUTE_PLAYER_MUTED_MESSAGE_DEFAULT = "<Muted Message>",
-	MUTE_PLAYER_MUTED = "Muted",
-	MUTE_PLAYER_PLAYER_UNMUTED = "You unmuted [<<1>>]",
-	MUTE_PLAYER_PLAYER_NOT_IN_LIST = "[<<1>>] is not currently muted.",
+	SESSION_MUTE_SESSION_MUTE_MENU_ITEM = "Session Mute",
+	SESSION_MUTE_SESSION_UNMUTE_MENU_ITEM = "Session Unmute",
+	SESSION_MUTE_SESSION_MUTE = "You muted [<<1>>]",
+	SESSION_MUTE_SHOW_LIST = "Muted players: ",
+	SESSION_MUTE_MUTED_MESSAGE_DEFAULT = "<Muted Message>",
+	SESSION_MUTE_MUTED = "Muted",
+	SESSION_MUTE_PLAYER_UNMUTED = "You unmuted [<<1>>]",
+	SESSION_MUTE_PLAYER_NOT_IN_LIST = "[<<1>>] is not currently muted.",
 
 	--LAM settings menu
-	MUTE_PLAYER_LAM_OPTIONS = "Options",
-	MUTE_PLAYER_LAM_CHAT_NOTIFY = "Notify in Chat of Muted Messages",
-	MUTE_PLAYER_LAM_CHAT_NOTIFY_TT = "If true this will display a chat message that a muted player has sent a message, but not what that message was.",
+	SESSION_MUTE_LAM_OPTIONS = "Options",
+	SESSION_MUTE_LAM_CHAT_NOTIFY = "Notify in Chat of Muted Messages",
+	SESSION_MUTE_LAM_CHAT_NOTIFY_TT = "If true this will display a chat message that a muted player has sent a message, but not what that message was.",
+	SESSION_MUTE_LAM_DESC_TEXT = "See ESOUI for detailed usage instructions.\nChat Slash-Commands: /sessionmutelist (list muted players)",
 }
 
 for id, stringVar in pairs(stringsEN) do
