@@ -60,7 +60,7 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 		-- If showMissedMessage then show the chat from a muted player, but 'mute' the text
 		if settings.showMissedMessage then
 			text = GetString(SESSION_MUTE_MUTED_MESSAGE_DEFAULT)
-		else return end
+		else return true end
 	else return end
 
 	local eventCategory = nil
@@ -155,8 +155,6 @@ local function OnLoad(e, addOnName)
 
 	
 	local function sessionMutePlayerContextMenu(playerName, rawName)
-		local name = rawName or playerName
-
 		local function mutePlayerForSession()
 			if not muteList[rawName] then
 				muteList[rawName] = true
