@@ -24,7 +24,8 @@ local function GetMutedPlayersList()
 	CHAT_ROUTER:AddSystemMessage(GetString(SESSION_MUTE_SHOW_LIST))
 	for name, isMuted in pairs(muteList) do
 		if isMuted then
-			CHAT_ROUTER:AddSystemMessage(name)
+			-- If we display the names as links, users can use the context menu to unmute from here
+			CHAT_ROUTER:AddSystemMessage(ZO_LinkHandler_CreatePlayerLink(name))
 		end
 	end
 end
@@ -51,8 +52,11 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 		return
 	end
 
-	local MultiLevelEventToCategoryMappings, SimpleEventToCategoryMappings = ZO_ChatSystem_GetEventCategoryMappings()
 	local messageType, fromName, text, isFromCustomerService, fromDisplayName = ...
+	if messageType == CHAT_CHANNEL_WHISPER_SENT then return end -- Sent whispers return target name, not the source. So we need to account for this
+
+	local MultiLevelEventToCategoryMappings, SimpleEventToCategoryMappings = ZO_ChatSystem_GetEventCategoryMappings()
+
 	local fmtFromName = zostrfor("<<1>>", fromName)
 
 	-- If 'muted', don't display (unless set to show that a message was missed)
