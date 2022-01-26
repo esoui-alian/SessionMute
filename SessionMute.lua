@@ -39,7 +39,7 @@ local function RemoveMutedPlayerFromList(name)
 		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(SESSION_MUTE_PLAYER_NOT_IN_LIST), name))
 	end
 end
-SLASH_COMMANDS["/sessionmuteremove"] = RemoveMutedPlayerFromList
+--SLASH_COMMANDS["/sessionmuteremove"] = RemoveMutedPlayerFromList
 
 ----------
 --Function for PreHook Chat Router (Hooked at OnPlayerActivated below)
