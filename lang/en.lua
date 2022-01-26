@@ -12,7 +12,7 @@ local stringsEN = {
 	SESSION_MUTE_LAM_OPTIONS = "Options",
 	SESSION_MUTE_LAM_CHAT_NOTIFY = "Notify in Chat of Muted Messages",
 	SESSION_MUTE_LAM_CHAT_NOTIFY_TT = "If true this will display a chat message that a muted player has sent a message, but not what that message was.",
-	SESSION_MUTE_LAM_DESC_TEXT = "See ESOUI for detailed usage instructions.\nChat Slash-Commands: /sessionmutelist (list muted players)",
+	SESSION_MUTE_LAM_DESC_TEXT = "See ESOUI for detailed usage instructions.\nChat Slash-Commands:\n /sessionmutelist (list muted players)\n /sessionmuteremove <Muted Name> (remove player from mute list)",
 }
 
 for id, stringVar in pairs(stringsEN) do

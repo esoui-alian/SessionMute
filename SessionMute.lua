@@ -24,8 +24,7 @@ local function GetMutedPlayersList()
 	CHAT_ROUTER:AddSystemMessage(GetString(SESSION_MUTE_SHOW_LIST))
 	for name, isMuted in pairs(muteList) do
 		if isMuted then
-			local fmtName = zostrfor("<<1>>", name) -- Because muteList stores rawName, we want to format it before displaying it
-			CHAT_ROUTER:AddSystemMessage(fmtName)
+			CHAT_ROUTER:AddSystemMessage(name)
 		end
 	end
 end
@@ -39,7 +38,7 @@ local function RemoveMutedPlayerFromList(name)
 		CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(SESSION_MUTE_PLAYER_NOT_IN_LIST), name))
 	end
 end
---SLASH_COMMANDS["/sessionmuteremove"] = RemoveMutedPlayerFromList
+SLASH_COMMANDS["/sessionmuteremove"] = RemoveMutedPlayerFromList
 
 ----------
 --Function for PreHook Chat Router (Hooked at OnPlayerActivated below)
@@ -54,9 +53,10 @@ local function FormatAndAddChatMessage(_, eventKey, ...)
 
 	local MultiLevelEventToCategoryMappings, SimpleEventToCategoryMappings = ZO_ChatSystem_GetEventCategoryMappings()
 	local messageType, fromName, text, isFromCustomerService, fromDisplayName = ...
+	local fmtFromName = zostrfor("<<1>>", fromName)
 
-	-- If 'muted', don't display
-	if fromDisplayName and (muteList[fromName] or muteList[fromDisplayName]) then
+	-- If 'muted', don't display (unless set to show that a message was missed)
+	if (not isFromCustomerService) and fromDisplayName and (muteList[fmtFromName] or muteList[fromDisplayName]) then
 		-- If showMissedMessage then show the chat from a muted player, but 'mute' the text
 		if settings.showMissedMessage then
 			text = GetString(SESSION_MUTE_MUTED_MESSAGE_DEFAULT)
@@ -121,12 +121,12 @@ local optionsTable = {
 		name = GetString(SESSION_MUTE_LAM_OPTIONS),
 		width = "full",	--or "half" (optional)
 	},
-    [2] = {
-        type = "description",
-        --title = "My Title",	--(optional)
-        text = GetString(SESSION_MUTE_LAM_DESC_TEXT),
-        width = "full",	--or "half" (optional)
-    },
+	[2] = {
+		type = "description",
+		--title = "My Title",	--(optional)
+		text = GetString(SESSION_MUTE_LAM_DESC_TEXT),
+		width = "full",	--or "half" (optional)
+	},
 	[3] = {
 		type = "checkbox",
 		name = GetString(SESSION_MUTE_LAM_CHAT_NOTIFY),
@@ -155,17 +155,17 @@ local function OnLoad(e, addOnName)
 
 	local function SessionMutePlayerContextMenu(playerName, rawName)
 		local function MutePlayerForSession()
-			if not muteList[rawName] then
-				muteList[rawName] = true
+			if not muteList[playerName] then
+				muteList[playerName] = true
 				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(SESSION_MUTE_SESSION_MUTE), playerName))
 			end
 		end
 
 		local function UnMutePlayerForSession()
-			RemoveMutedPlayerFromList(rawName)
+			RemoveMutedPlayerFromList(playerName)
 		end
 
-		if not muteList[rawName] then
+		if not muteList[playerName] then
 			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
 		else
 			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
