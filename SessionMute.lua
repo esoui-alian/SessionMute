@@ -153,27 +153,26 @@ local function OnLoad(e, addOnName)
 	LAM:RegisterAddonPanel(addonName, panelData)
 	LAM:RegisterOptionControls(addonName, optionsTable)
 
-	
-	local function sessionMutePlayerContextMenu(playerName, rawName)
-		local function mutePlayerForSession()
+	local function SessionMutePlayerContextMenu(playerName, rawName)
+		local function MutePlayerForSession()
 			if not muteList[rawName] then
 				muteList[rawName] = true
 				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(SESSION_MUTE_SESSION_MUTE), playerName))
 			end
 		end
 
-		local function unMutePlayerForSession()
+		local function UnMutePlayerForSession()
 			RemoveMutedPlayerFromList(rawName)
 		end
 
 		if not muteList[rawName] then
-			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_MUTE_MENU_ITEM), mutePlayerForSession)
+			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_MUTE_MENU_ITEM), MutePlayerForSession)
 		else
-			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_UNMUTE_MENU_ITEM), unMutePlayerForSession)
+			AddCustomMenuItem(GetString(SESSION_MUTE_SESSION_UNMUTE_MENU_ITEM), UnMutePlayerForSession)
 		end
 	end
 
-	LibCustomMenu:RegisterPlayerContextMenu(sessionMutePlayerContextMenu, LibCustomMenu.CATEGORY_LATE)
+	LibCustomMenu:RegisterPlayerContextMenu(SessionMutePlayerContextMenu, LibCustomMenu.CATEGORY_LATE)
 	
 end
 EVENT_MANAGER:RegisterForEvent(addonName, EVENT_ADD_ON_LOADED, OnLoad)
