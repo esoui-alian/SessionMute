@@ -12,7 +12,7 @@ local stringsDE = {
 	SESSION_MUTE_LAM_OPTIONS = "Optionen",
 	SESSION_MUTE_LAM_CHAT_NOTIFY = "Im Chat benachrichtigen",
 	SESSION_MUTE_LAM_CHAT_NOTIFY_TT = "Ist diese Option aktiviert, so wird im Chat eine Nachricht angezeigt, wenn der stummgeschaltete Spieler eine Nachricht gesendet hat (ohne Inhalt dieser Nachricht).",
-	SESSION_MUTE_LAM_DESC_TEXT = "See ESOUI for detailed usage instructions.\n\nChat Slash-Commands:\n /sessionmutelist (list muted players)\n /sessionmuteremove <Muted Name> (remove player from mute list)",
+	SESSION_MUTE_LAM_DESC_TEXT = "Schau bei ESOUI nach, um mehr Details zum Umfang und der Nutzung dieses Addons zu erhalten\n\nChat Slash-Befehle:\n /sessionmutelist (listet die stummgeschalteten Spieler auf)\n /sessionmuteremove <Stummgeschalteter Name> (etnferne Spieler von der stummgeschalteten Liste)",
 }
 
 for id, stringVar in pairs(stringsDE) do
