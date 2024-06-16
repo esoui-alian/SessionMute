@@ -1,9 +1,9 @@
 ## Title: Session Mute
 ## Author: Alianym
 ## Description: Session Mutes in chat!
-## Version: 0.01
-## AddOnVersion: 000001
-## APIVersion: 101032
+## Version: 1.10
+## AddOnVersion: 000110
+## APIVersion: 101040
 ## SavedVariables: SessionMuteSavedVars
 ## DependsOn: LibAddonMenu-2.0 LibCustomMenu>=692
 ## OptionalDependsOn: pChat rChat

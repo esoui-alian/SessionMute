@@ -162,6 +162,8 @@ local function OnLoad(e, addOnName)
 			if not muteList[playerName] then
 				muteList[playerName] = true
 				CHAT_ROUTER:AddSystemMessage(zostrfor(GetString(SESSION_MUTE_SESSION_MUTE), playerName))
+				-- Modified Version
+				ZO_KeyboardChatWindowTemplate1Buffer:Clear()
 			end
 		end
 
