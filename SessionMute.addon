@@ -3,7 +3,7 @@
 ## Description: Session Mutes in chat!
 ## Version: 1.10
 ## AddOnVersion: 000110
-## APIVersion: 101040
+## APIVersion: 101045 101046
 ## SavedVariables: SessionMuteSavedVars
 ## DependsOn: LibAddonMenu-2.0 LibCustomMenu>=692
 ## OptionalDependsOn: pChat rChat
